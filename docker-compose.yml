@@ -1,0 +1,20 @@
+version: '3'
+services:
+  MathFinder:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: jpatrick1/mathfinder
+    hostname: mf
+    volumes:
+      - /home/$USER/.mathfinder:/.mathfinder
+      - ./data:/data
+      - /tmp/.X11-unix:/tmp/.X11-unix
+    environment:
+      - USER=$USER
+      - DISPLAY=$DISPLAY
+      - LD_LIBRARY_PATH=/usr/local/lib
+      - TESSDATA_PREFIX=/usr/local/share
+      - SCROLLVIEW_PATH=/usr/local/share/scrollview
+    working_dir: /data
+    entrypoint: bash
