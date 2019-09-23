@@ -17,6 +17,7 @@ AC_PROG_CC
 AC_PROG_MAKE_SET
 
 # Checks for libraries.
+PKG_CHECK_MODULES(LEPTONICA, lept >= 1.74, have_lept=true, have_lept=false)
 
 # Checks for header files.
 AC_CHECK_HEADERS([stddef.h stdlib.h string.h])
