@@ -8,7 +8,7 @@ services:
     hostname: mf
     volumes:
       - /home/$USER/.mathfinder:/.mathfinder
-      - ./data:/data
+      - ./data/Groundtruth/WithoutLabels:/.mathfinder/groundtruth
       - /tmp/.X11-unix:/tmp/.X11-unix
     environment:
       - USER=$USER
@@ -16,5 +16,5 @@ services:
       - LD_LIBRARY_PATH=/usr/local/lib
       - TESSDATA_PREFIX=/usr/local/share
       - SCROLLVIEW_PATH=/usr/local/share/scrollview
-    working_dir: /data
+    working_dir: /.mathfinder/groundtruth/
     entrypoint: bash
