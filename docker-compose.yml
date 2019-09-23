@@ -7,7 +7,7 @@ services:
     image: jpatrick1/mathfinder
     hostname: mf
     volumes:
-      - /home/$USER/.mathfinder:/.mathfinder
+      - ./training:/.mathfinder/training
       - ./data/Groundtruth/WithoutLabels:/.mathfinder/groundtruth
       - /tmp/.X11-unix:/tmp/.X11-unix
     environment:

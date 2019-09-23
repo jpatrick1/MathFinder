@@ -79,5 +79,6 @@ shapeclustering
 stamp-h1
 tesseract
 tesseract-ocr
+training
 unicharset_extractor
 wordlist2dawg
