@@ -73,7 +73,7 @@ libCOMMON_la_CPPFLAGS = -IGRID \
 -IGRID/Top/Cell/Comp/Data/NGram/NGProfile \
 -IGRID/Top/Cell/Comp/RecData/Block/Sentence \
 -IRESULTS \
-$(LEPTONICA_CFLAGS) \
+-I/usr/include/leptonica \
 -I$(tesspath)/api \
 -I$(tesspath)/ccmain -I$(tesspath)/ccstruct \
 -I$(tesspath)/ccutil -I$(tesspath)/classify \
@@ -87,6 +87,6 @@ $(LEPTONICA_CFLAGS) \
 -I$(tesspath)/training -I$(tesspath)/viewer \
 -I$(tesspath)/wordrec -I$(tesspath)
 
-libCOMMON_la_LIBADD = $(LEPTONICA_LIBS) \
+libCOMMON_la_LIBADD = /usr/lib/x86_64-linux-gnu/liblept.so \
 $(tesspath)/api/libtesseract.la
 
