@@ -71,7 +71,7 @@ void runInteractiveMenu() {
   delete mainMenu;
 }
 
-void runFinder(char* path, bool doJustDetection) {
+void runFinder(char* path, bool doJustDetection, bool displayResults) {
   const std::string trainedFinderPath =
       FinderTrainingPaths::getTrainedFinderRoot();
   Utils::exec(std::string("mkdir -p ") + trainedFinderPath, true);
@@ -136,8 +136,10 @@ void runFinder(char* path, bool doJustDetection) {
   pixaDestroy(&images); // destroy finished image(s)
 
   // Display the results
-  for(int i = 0; i < results.size(); ++i) {
-    results[i]->displaySegmentationResults();
+  if(displayResults) {
+    for(int i = 0; i < results.size(); ++i) {
+	  results[i]->displaySegmentationResults();
+    }
   }
 
   // Write the results to a directory in the current location (creates
@@ -146,8 +148,7 @@ void runFinder(char* path, bool doJustDetection) {
   if(doJustDetection) {
     resultsDirName = resultsDirName + "_detection_only";
   }
-  MathExpressionFinderResults::printResultsToFiles(results,
-      resultsDirName);
+  MathExpressionFinderResults::printResultsToFiles(results, resultsDirName);
 
   // Destroy results
   for(int i = 0; i < results.size(); ++i) {

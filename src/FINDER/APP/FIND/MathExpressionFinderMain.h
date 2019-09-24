@@ -12,7 +12,7 @@
 
 void runInteractiveMenu();
 
-void runFinder(char* path, bool doJustDetection=false);
+void runFinder(char* path, bool doJustDetection=false, bool displayResults=false);
 
 // Runs trainer in isolation (for debug/experiment purposes)
 static void runTrainer();
