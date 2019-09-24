@@ -135,10 +135,10 @@ void runFinder(char* path, bool doJustDetection) {
 
   pixaDestroy(&images); // destroy finished image(s)
 
-  // Display the results
-  for(int i = 0; i < results.size(); ++i) {
-    results[i]->displaySegmentationResults();
-  }
+//  // Display the results
+//  for(int i = 0; i < results.size(); ++i) {
+//    results[i]->displaySegmentationResults();
+//  }
 
   // Write the results to a directory in the current location (creates
   // the directory)
