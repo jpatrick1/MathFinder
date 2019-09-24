@@ -220,7 +220,7 @@ MathFinder_CPPFLAGS = -IEVAL \
 -IFIND/Top/MathFind/Top/Comp/FeatExt/Top/Comp/Imp/Rec/Other/Top/Desc/Flag \
 -IFIND/Top/MathFind/Top/Comp/FeatExt/Top/Comp/Imp/Rec/NGrams/Top/NGProfile \
 -IFIND/Top/MathFind/Top/Comp/FeatExt/Top/Comp/Imp/Rec/SubSup/Top/Data \
--I/usr/local/include/leptonica \
+-I/usr/include/leptonica \
 -I$(commonpath)/GRID \
 -I$(commonpath)/GRID/Top/Cell/Comp/Spatial \
 -I$(commonpath)/GRID/Top/Cell/Comp/Spatial/Merge \
@@ -256,7 +256,7 @@ MathFinder_CPPFLAGS = -IEVAL \
 -I$(tesspath)/wordrec -I$(tesspath) \
 -I$(dlibpath)
 
-MathFinder_LDADD = /usr/local/lib/liblept.so \
+MathFinder_LDADD = /usr/lib/x86_64-linux-gnu/liblept.so \
 $(tesspath)/api/libtesseract.la \
 $(dlibpath)/dlib/libdlib.la \
 $(dlibpath)/dlib/threads/libthreads.la \
