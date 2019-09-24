@@ -146,8 +146,7 @@ void runFinder(char* path, bool doJustDetection) {
   if(doJustDetection) {
     resultsDirName = resultsDirName + "_detection_only";
   }
-  MathExpressionFinderResults::printResultsToFiles(results,
-      resultsDirName);
+  MathExpressionFinderResults::printResultsToFiles(results, resultsDirName);
 
   // Destroy results
   for(int i = 0; i < results.size(); ++i) {
