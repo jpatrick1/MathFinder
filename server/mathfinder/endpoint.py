@@ -65,8 +65,6 @@ def display_detections(image, detections):
     image_content = image.content_type in ["image/png", "image/jpeg"]
     detection_content = detections.content_type == "application/json"
     if image_content and detection_content:
-        # image = image.stream.read()
-        # detections = detections
         overlay = util.display_detections(image, detections)
         response = overlay, 200
     else:

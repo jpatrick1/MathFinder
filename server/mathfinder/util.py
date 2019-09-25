@@ -372,7 +372,7 @@ def display_detections(image, detections):
     bytes
         Jpeg image overlay as bytes file
     """
-    dets = json.load(detections)
+    dets = json.loads(detections.stream.read().decode("utf-8"))
     overlay = Image.open(image).convert('RGB')
     pen = ImageDraw.Draw(overlay)
     for img_info in dets["images"]:
