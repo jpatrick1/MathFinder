@@ -61,8 +61,20 @@ def run_math_finder(path, ext, display=False):
     return response
 
 
-def display_detections(image, body):
-    util.display_detections(image, body)
+def display_detections(image, detections):
+    image_content = image.content_type in ["image/png", "image/jpeg"]
+    detection_content = detections.content_type == "application/json"
+    if image_content and detection_content:
+        # image = image.stream.read()
+        # detections = detections
+        overlay = util.display_detections(image, detections)
+        response = overlay, 200
+    else:
+        error_msg = "Invalid content type image: [image/png, image/jpeg] and detections == application/json"
+        LOG.debug(error_msg)
+        response = {"error_message": error_msg}, 400
+
+    return response
 
 
 def math_finder(input, body):

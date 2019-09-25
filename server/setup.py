@@ -23,7 +23,8 @@ setup(
     install_requires=[
         'tornado',
         'connexion',
-        'swagger-ui-bundle'
+        'swagger-ui-bundle',
+        'Pillow'
     ],
     entry_points={
         'console_scripts': [

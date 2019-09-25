@@ -9,12 +9,15 @@ LOG : logging.Logger
     Module logger
 """
 import os
+import io
+import json
 import sys
 import re
 import errno
 import logging
 import pathlib
 import hashlib
+from PIL import Image, ImageDraw, ImageFont
 
 LOG = logging.getLogger(__name__)
 
@@ -353,34 +356,34 @@ def file_chunk_generator(filename, block_size=65536):
                 break
 
 
-def display_detections(image_path, detections):
+def display_detections(image, detections):
     """
     Displays results object from run_math_finder
 
     Parameters
     ----------
-    image_path : str
-        Root path of images defined in detections
-    detections : dict
+    image : fobj
+        file object for image
+    detections : fobj
         Results object in coco format
 
+    Returns
+    -------
+    bytes
+        Jpeg image overlay as bytes file
     """
-    import matplotlib.pyplot as plt
-    import matplotlib.patches as patches
-
-    for img_info in detections["images"]:
+    dets = json.load(detections)
+    overlay = Image.open(image).convert('RGB')
+    pen = ImageDraw.Draw(overlay)
+    for img_info in dets["images"]:
         id = img_info["id"]
-        file_name = img_info["file_name"]
+        if image.filename == img_info["file_name"]:
+            for d in dets["detections"]:
+                if id == d["image_id"]:
+                    x, y, w, h = d["bbox"]
+                    color = "blue" if d["category_id"] else 'red'
+                    pen.rectangle(xy=[x, y, x + w, y + h], outline=color, width=4)
 
-        fig, ax = plt.subplots(1)
-        img = plt.imread(os.path.join(image_path, file_name))
-        ax.imshow(img, cmap='gray')
-
-        for d in detections["detections"]:
-            if id == d["image_id"]:
-                x, y, w, h = d["bbox"]
-                color = "b" if d["category_id"] else 'r'
-                rect = patches.Rectangle((x, y), w, h, linewidth=1, edgecolor=color, facecolor='none')
-                ax.add_patch(rect)
-
-        plt.show()
+    mem_img = io.BytesIO()
+    overlay.save(mem_img, format="jpeg")
+    return mem_img.getvalue()

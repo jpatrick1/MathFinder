@@ -5,47 +5,9 @@ import argparse
 import logging
 import connexion
 from mathfinder.util import which
+from mathfinder.api import API
 
 LOG = logging.getLogger(__name__)
-
-API = {
-    "openapi": "3.0.0",
-    "info": {
-        "title": "MathFinder",
-        "version": "1",
-        "description": "HTTP Interface for MathFinder"},
-    "paths": {
-        "/runMathFinder": {
-            "post": {
-                "summary": "Returns Rect Information",
-                "tags": ["MathFinder"],
-                "operationId": "mathfinder.endpoint.math_finder",
-                "requestBody": {
-                    "content": {
-                        "multipart/form-data": {
-                            "schema": {
-                                "type": "object",
-                                "properties": {
-                                    "input": {
-                                        "type": "string",
-                                        "format": "binary"}},
-                                "required": ["input"]}}}},
-                "responses": {
-                    "200": {
-                        "description": "Rect JSON",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "type": "object",
-                                    "properties": {}}
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
 
 
 def parse_args():
@@ -71,7 +33,11 @@ def parse_args():
     os.environ["HOST"] = args.host
     os.environ["PORT"] = str(args.port)
     os.environ["BASEPATH"] = args.base_path
-    os.environ["MATH_FINDER"] = args.exe_path
+
+    try:
+        os.environ["MATH_FINDER"] = args.exe_path
+    except TypeError as e:
+        pass
     return args
 
 
