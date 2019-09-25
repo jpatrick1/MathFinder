@@ -14,6 +14,7 @@ import re
 import errno
 import logging
 import pathlib
+import hashlib
 
 LOG = logging.getLogger(__name__)
 
@@ -192,6 +193,16 @@ def mkdir_p(path):
 
 
 def prep_data_for_training(image_path, output_path):
+    """
+    Combines multiple folders for training
+
+    Parameters
+    ----------
+    image_path : str
+        Root path of images, recursively combines all folders with images that contain a .rect file
+    output_path : str
+        Combined output path
+    """
     start_index = 0
     all_rects = []
     for rect_file in pathlib.Path(image_path).glob("**/*.rect"):
@@ -219,9 +230,157 @@ def prep_data_for_training(image_path, output_path):
 
 
 def read_rect_file(rect_file):
+    """
+    Parses MathFinder .rect file
+
+    Parameters
+    ----------
+    rect_file : str
+        Path to .rect file
+
+    Returns
+    -------
+    list[list[str]]
+        [image label x1 y1 x2 y2]
+    """
     rects = []
     with open(rect_file, 'r') as fin:
         for line in fin:
             rects.append(line.strip().split())
 
     return rects
+
+
+def which(program):
+    """
+    Finds location of executable, mimics UNIX 'which'
+
+    Parameters
+    ----------
+    program : str
+        Name of executable to search for
+
+    Returns
+    -------
+    {str, None}
+        Path to executable or None if it is not found
+
+    References
+    ----------
+    https://stackoverflow.com/questions/377017/test-if-executable-exists-in-python
+    """
+
+    def is_exe(fpath):
+        return os.path.isfile(fpath) and os.access(fpath, os.X_OK)
+
+    fpath, fname = os.path.split(program)
+    if fpath:
+        if is_exe(program):
+            return program
+    else:
+        for path in os.environ["PATH"].split(os.pathsep):
+            exe_file = os.path.join(path, program)
+            if is_exe(exe_file):
+                return exe_file
+
+    return None
+
+
+def get_checksum(filename=None, xtra_str=None, hasher="sha256", ashex=True):
+    """
+    Returns checksum of a file and/or string
+
+    Parameters
+    ----------
+    filename : str, optional
+        Fullpath to file
+
+    xtra_str : str, optional
+        Any arbitrary string
+    hasher : hashlib.method
+        Hashlib secure hash algorithm, defaults to sha256
+    ashex
+        Flag that indicates whether to return the has as a hex string
+
+    Returns
+    -------
+    hash : str
+        Encoded/hashed string
+    """
+    if hasher == "sha256":
+        hasher = hashlib.sha256()
+    elif hasher == "md5":
+        hasher = hashlib.md5()
+
+    if isinstance(filename, str):
+        for block in file_chunk_generator(filename):
+            hasher.update(block)
+    elif isinstance(filename, bytes):
+        hasher.update(filename)
+    elif isinstance(filename, memoryview):
+        hasher.update(bytes(filename))
+
+    if xtra_str is not None:
+        hasher.update(xtra_str)
+
+    hash = hasher.hexdigest() if ashex else hasher.digest()
+    return hash
+
+
+def file_chunk_generator(filename, block_size=65536):
+    """
+    Chunks file on read and returns in a generator.
+
+    Parameters
+    ----------
+    filename : str
+        Filename
+    block_size : str
+        Size in bytes of the chunks
+
+    Yields
+    ------
+    block : bytes
+        Block of bytes
+    """
+    filename = expand_path(filename)
+    with open(filename, 'rb') as fid:
+        while True:
+            block = fid.read(block_size)
+            if len(block):
+                yield block
+            else:
+                break
+
+
+def display_detections(image_path, detections):
+    """
+    Displays results object from run_math_finder
+
+    Parameters
+    ----------
+    image_path : str
+        Root path of images defined in detections
+    detections : dict
+        Results object in coco format
+
+    """
+    import matplotlib.pyplot as plt
+    import matplotlib.patches as patches
+
+    for img_info in detections["images"]:
+        id = img_info["id"]
+        file_name = img_info["file_name"]
+
+        fig, ax = plt.subplots(1)
+        img = plt.imread(os.path.join(image_path, file_name))
+        ax.imshow(img, cmap='gray')
+
+        for d in detections["detections"]:
+            if id == d["image_id"]:
+                x, y, w, h = d["bbox"]
+                color = "b" if d["category_id"] else 'r'
+                rect = patches.Rectangle((x, y), w, h, linewidth=1, edgecolor=color, facecolor='none')
+                ax.add_patch(rect)
+
+        plt.show()
