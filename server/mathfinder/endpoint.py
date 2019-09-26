@@ -20,8 +20,9 @@ LOG = logging.getLogger(__name__)
 
 
 def run_math_finder(path, ext, display=False):
-    cmd = f'bash -c "cd {path} && $MATH_FINDER {path}"'
-    proc = sp.run(shlex.split(cmd), env=os.environ, capture_output=True)
+    cmd = 'bash -c "cd {path} && $MATH_FINDER {path}"'.format(path=path)
+    # proc = sp.run(shlex.split(cmd), env=os.environ, capture_output=True)
+    proc = sp.run(shlex.split(cmd), env=os.environ, stdout=sp.PIPE, stderr=sp.PIPE)
 
     if proc.returncode:
         error_msg = proc.stderr.decode("utf-8")
@@ -58,6 +59,10 @@ def run_math_finder(path, ext, display=False):
             util.display_detections(path, results)
 
     return response
+
+
+def display_detections(image, body):
+    util.display_detections(image, body)
 
 
 def math_finder(input, body):

@@ -1,3 +1,5 @@
+# USER_ID=$(id -u):$(id -g) docker-compose up -d
+
 version: '3'
 services:
   MathFinder:
@@ -6,9 +8,10 @@ services:
       dockerfile: Dockerfile
     image: jpatrick1/mathfinder
     hostname: mf
+    user: $USER_ID
     volumes:
-      - ./training:/.mathfinder/training
-      - ./data/Groundtruth/WithoutLabels:/.mathfinder/groundtruth
+#      - ./training:/.mathfinder/training
+      - ./data/Groundtruth/WithoutLabels:/data
       - /tmp/.X11-unix:/tmp/.X11-unix
     environment:
       - USER=$USER
@@ -17,4 +20,13 @@ services:
       - TESSDATA_PREFIX=/usr/local/share
       - SCROLLVIEW_PATH=/usr/local/share/scrollview
     working_dir: /.mathfinder/groundtruth/
-    entrypoint: bash
+    ports:
+      - 9030:9030
+    
+    # drop into bash shell
+    # useful for bind mounting data and doing a training session
+    # run MathFinder -m to get training menu
+#    entrypoint: bash
+
+    # run http server
+    entrypoint: python -m mathfinder.server

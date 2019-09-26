@@ -5,7 +5,9 @@ see Dockerfile
 
 ## Usage
 Need to run as host user so GUI apps work.  
-`docker-compose run --user=$(id -u):$(id -g) MathFinder`
+`USER_ID=$(id -u):$(id -g) docker-compose run -p 9030:9030 MathFinder`
+
+`USER_ID=$(id -u):$(id -g) docker-compose up -d`
 
 ```bash
 # inside running container

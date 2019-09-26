@@ -256,7 +256,7 @@ MathFinder_CPPFLAGS = -IEVAL \
 -I$(tesspath)/wordrec -I$(tesspath) \
 -I$(dlibpath)
 
-MathFinder_LDADD = /usr/lib/x86_64-linux-gnu/liblept.so \
+MathFinder_LDADD = /usr/lib/liblept.so \
 $(tesspath)/api/libtesseract.la \
 $(dlibpath)/dlib/libdlib.la \
 $(dlibpath)/dlib/threads/libthreads.la \

@@ -37,7 +37,15 @@ API = {
                             "application/json": {
                                 "schema": {
                                     "type": "object",
-                                    "properties": {}}}}}}}}}}
+                                    "properties": {}}
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
 
 
 def parse_args():
@@ -51,9 +59,6 @@ def parse_args():
     host = os.environ.get("HOST", "0.0.0.0")
     port = os.environ.get("PORT", 9030)
     base_path = os.environ.get("BASEPATH", "/api/v1")
-
-    # test
-    # os.environ["PATH"] = "/home/patricja/code/MathFinder/src/FINDER/APP/:" + os.environ["PATH"]
     exe_path = os.environ.get("MATH_FINDER", which('MathFinder'))
 
     parser = argparse.ArgumentParser(description=h['program'], formatter_class=argparse.ArgumentDefaultsHelpFormatter)
@@ -79,6 +84,6 @@ def main():
 
 
 if __name__ == '__main__':
-    logging.basicConfig(level=logging.INFO,
+    logging.basicConfig(level=logging.DEBUG,
                         format='[%(asctime)s][%(module)s:%(funcName)s:%(lineno)d] %(levelname)s - %(message)s')
     main()

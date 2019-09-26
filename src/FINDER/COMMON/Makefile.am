@@ -87,6 +87,6 @@ libCOMMON_la_CPPFLAGS = -IGRID \
 -I$(tesspath)/training -I$(tesspath)/viewer \
 -I$(tesspath)/wordrec -I$(tesspath)
 
-libCOMMON_la_LIBADD = /usr/lib/x86_64-linux-gnu/liblept.so \
+libCOMMON_la_LIBADD = /usr/lib/liblept.so \
 $(tesspath)/api/libtesseract.la
 

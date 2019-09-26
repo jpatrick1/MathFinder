@@ -27,7 +27,7 @@ setup(
     ],
     entry_points={
         'console_scripts': [
-            f'{entrypoint} = {pkg_name}.server:main'
+            '{} = {}.server:main'.format(entrypoint, pkg_name)
         ],
     },
     package_data={
