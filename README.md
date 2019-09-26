@@ -13,3 +13,8 @@ Need to run as host user so GUI apps work.
 # inside running container
 MathFinder -m
 ```
+
+## HTTP Server w/Swagger Interface
+Run docker-compose w/entrypoint `python -m mathfinder.server`  
+
+Swagger interface: http://localhost:9030/api/v1/ui
