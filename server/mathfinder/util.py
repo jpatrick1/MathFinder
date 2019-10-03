@@ -17,6 +17,9 @@ import errno
 import logging
 import pathlib
 import hashlib
+import time
+import urllib
+import requests
 from PIL import Image, ImageDraw, ImageFont
 
 LOG = logging.getLogger(__name__)
@@ -387,3 +390,72 @@ def display_detections(image, detections):
     mem_img = io.BytesIO()
     overlay.save(mem_img, format="jpeg")
     return mem_img.getvalue()
+
+
+_SESSION = None
+_URL = None
+
+
+def get_session(server_url, max_retries=10, delay=1):
+    global _SESSION
+    global _URL
+
+    LOG.debug(server_url)
+
+    if server_url != _URL:
+        _URL = server_url
+        LOG.debug("session url is difference, a new session will be created")
+        _SESSION = None
+
+    if _SESSION is None:
+        for i in range(max_retries):
+            try:
+                code = requests.get(server_url).status_code
+
+                if code == 200:
+                    _SESSION = requests.Session()
+                    break
+            except ConnectionResetError as e:
+                _SESSION = None
+                err_msg = f"Attempt: {i}\tURL: {server_url}\tError: {e}"
+                LOG.error(err_msg)
+                LOG.error("Unable to connect to server, it might still be starting up or isn't running")
+            except urllib.error.HTTPError as e:
+                _SESSION = None
+                err_msg = f"Attempt: {i}\tURL: {server_url}\tError: {e}"
+                LOG.error(err_msg)
+            except Exception as e:
+                _SESSION = None
+                err_msg = f"Attempt: {i}\tURL: {server_url}\tError: {e}"
+                LOG.error(err_msg)
+
+            time.sleep(delay)
+
+    return _SESSION
+
+
+def urljoin(*parts):
+    normalized_parts = []
+    for p in parts:
+        if p[0] == "/":
+            p = p[1:]
+
+        if p[-1] != "/":
+            p = p + "/"
+
+        normalized_parts.append(p)
+
+    url = ''.join(normalized_parts)
+    url = url if url[-1] != "/" else url[:-1]
+    return url
+
+
+def pprints(data):
+    return json.dumps(data, sort_keys=True, indent=4, separators=(', ', ' : '))
+
+
+def pprint(data):
+    '''
+    Pretty prints json data.
+    '''
+    print(pprints(data))
