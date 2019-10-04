@@ -408,6 +408,7 @@ def get_session(server_url, max_retries=10, delay=1):
         _SESSION = None
 
     if _SESSION is None:
+        err_msg_template = "Attempt: {:d}\tURL: {:s}\tError: {:s}"
         for i in range(max_retries):
             try:
                 code = requests.get(server_url).status_code
@@ -417,16 +418,16 @@ def get_session(server_url, max_retries=10, delay=1):
                     break
             except ConnectionResetError as e:
                 _SESSION = None
-                err_msg = f"Attempt: {i}\tURL: {server_url}\tError: {e}"
+                err_msg = err_msg_template.format(i, server_url, str(e))
                 LOG.error(err_msg)
                 LOG.error("Unable to connect to server, it might still be starting up or isn't running")
             except urllib.error.HTTPError as e:
                 _SESSION = None
-                err_msg = f"Attempt: {i}\tURL: {server_url}\tError: {e}"
+                err_msg = err_msg_template.format(i, server_url, str(e))
                 LOG.error(err_msg)
             except Exception as e:
                 _SESSION = None
-                err_msg = f"Attempt: {i}\tURL: {server_url}\tError: {e}"
+                err_msg = err_msg_template.format(i, server_url, str(e))
                 LOG.error(err_msg)
 
             time.sleep(delay)
@@ -459,3 +460,11 @@ def pprint(data):
     Pretty prints json data.
     '''
     print(pprints(data))
+
+
+def get_image_list(path, ext='.png', recursive=True):
+    if recursive:
+        file_list = natural_sort([p.as_posix() for p in pathlib.Path(path).glob("**/*{:s}".format(ext))])
+    else:
+        file_list = natural_sort([p.as_posix() for p in pathlib.Path(path).glob("*{:s}".format(ext))])
+    return file_list

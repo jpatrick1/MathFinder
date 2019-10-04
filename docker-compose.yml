@@ -29,4 +29,4 @@ services:
 #    entrypoint: bash
 
     # run http server
-    entrypoint: python -m mathfinder.server
+    #    entrypoint: python -m mathfinder.server

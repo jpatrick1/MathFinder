@@ -23,6 +23,10 @@ def run_math_finder(path, ext, display=False):
     cmd = 'bash -c "cd {path} && $MATH_FINDER {path}"'.format(path=path)
     # proc = sp.run(shlex.split(cmd), env=os.environ, capture_output=True)
     proc = sp.run(shlex.split(cmd), env=os.environ, stdout=sp.PIPE, stderr=sp.PIPE)
+    image_list = util.get_image_list(path, ext=ext, recursive=False)
+    image_index = [util.split_fname(f)[1] for f in image_list]
+    image_map = {f: i for i, f in enumerate(image_index)}
+    images = [{"id": image_map[f], "file_name": f + ext} for f in image_index]
 
     if proc.returncode:
         error_msg = proc.stderr.decode("utf-8")
@@ -33,15 +37,12 @@ def run_math_finder(path, ext, display=False):
         dets = util.read_rect_file(os.path.join(path, os.path.basename(path), "results.rect"))
         labels = {"displayed": 0, "embedded": 1}
         results = {
-            "images": [],
+            "images": images,
             "categories": [
                 {"id": 0, "name": "displayed"},
                 {"id": 1, "name": "embedded"}],
             "detections": []}
 
-        image_index = sorted(list(set([d[0] for d in dets])))
-        image_map = {f: i for i, f in enumerate(image_index)}
-        results["images"] = [{"id": image_map[f], "file_name": f + ext} for f in image_index]
         for img, lbl, x1, y1, x2, y2 in dets:
             x1, y1, x2, y2 = int(x1), int(y1), int(x2), int(y2)
             det = {
@@ -76,16 +77,15 @@ def display_detections(image, detections):
 
 
 def math_finder(input, body):
-    if hasattr(input, "filename"):
-        filename = input.filename
-        ext = os.path.splitext(filename)[1]
+    filename = input.filename
+    ext = os.path.splitext(filename)[1]
 
     with tempfile.TemporaryDirectory() as temp_path:
-        filename = os.path.join(temp_path, filename)
-        with open(filename, 'wb') as f:
+        with open(os.path.join(temp_path, "0" + ext), 'wb') as f:
             f.write(input.stream.read())
         try:
             response = run_math_finder(temp_path, ext)
+            response[0]["images"][0]["file_name"] = input.filename
         except Exception as err:
             error_msg = str(err)
             LOG.error(error_msg)

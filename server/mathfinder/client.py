@@ -41,7 +41,7 @@ def get_detections(image_filename, server_url="http://localhost:9030/api/v1"):
 
             # TODO, fix in server
             # need to label image starting w/0
-            'input': (f"0{ext}", image, content_type)
+            'input': ("0{:s}".format(ext), image, content_type)
         }
 
         response = session.post(url, data=data, files=files)

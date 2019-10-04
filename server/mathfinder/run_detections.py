@@ -13,9 +13,10 @@ def get_detections(image):
     # return client.get_detections(image)
 
 
-image_root = os.path.expandvars("$HOME/code/MathFinder/data/Groundtruth/WithoutLabels/")
+# image_root = os.path.expandvars("$HOME/code/MathFinder/data/Groundtruth/WithoutLabels/")
+image_root = os.path.expandvars("$HOME/Documents/deep_equations/troubleshoot/")
 
-file_list = util.natural_sort([p.as_posix() for p in pathlib.Path(image_root).glob("**/*.png")])
+file_list = util.get_image_list(image_root, ext=".png")
 files = FileLoader(file_list, apply_composite=[get_detections], skip_read=True, readers=1, workers=18)
 
 for idx, (meta, detections) in enumerate(files):
