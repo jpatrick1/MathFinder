@@ -21,12 +21,18 @@ LOG = logging.getLogger(__name__)
 
 def run_math_finder(path, ext, display=False):
     cmd = 'bash -c "cd {path} && $MATH_FINDER {path}"'.format(path=path)
-    # proc = sp.run(shlex.split(cmd), env=os.environ, capture_output=True)
     proc = sp.run(shlex.split(cmd), env=os.environ, stdout=sp.PIPE, stderr=sp.PIPE)
     image_list = util.get_image_list(path, ext=ext, recursive=False)
     image_index = [util.split_fname(f)[1] for f in image_list]
     image_map = {f: i for i, f in enumerate(image_index)}
     images = [{"id": image_map[f], "file_name": f + ext} for f in image_index]
+
+    # add width/height information to images
+    for idx, img_fn in enumerate(image_list):
+        img = open(img_fn, "rb").read()
+        c, w, h = util.get_image_info(img)
+        images[idx]["height"] = h
+        images[idx]["width"] = w
 
     if proc.returncode:
         error_msg = proc.stderr.decode("utf-8")
@@ -92,3 +98,6 @@ def math_finder(input, body):
             response = json.dumps({"error_message": error_msg}), 400
 
     return response
+
+
+run_math_finder("/home/patricja/code/MathFinder.copy/data/Groundtruth/WithoutLabels/advcalc1", ".png")

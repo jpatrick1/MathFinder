@@ -14,15 +14,98 @@ import json
 import sys
 import re
 import errno
+import struct
 import logging
 import pathlib
 import hashlib
 import time
 import urllib
 import requests
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image, ImageDraw
 
 LOG = logging.getLogger(__name__)
+
+
+def get_image_info(data):
+    """Extracts image type, width, and height for given data buffer.
+
+    Parameters:
+    ----------
+    data : byte array
+        first n raw bytes of image, n ~ 50 works for gif/png and jpg needs n ~ 1000
+    Returns
+    -------
+    content_type : str
+        gif|png|jpg
+    width : int
+        Width of image
+    height : int
+        Height of image
+    """
+    if isinstance(data, str):
+        with open(data, 'rb') as f:
+            data = f.read(1000)
+
+    if not isinstance(data, bytes):
+        raise TypeError("Need to pass raw bytes or a valid filename")
+
+    size = len(data)
+    height = -1
+    width = -1
+    content_type = ''
+
+    # handle GIFs
+    if (size >= 10) and data[:6] in (b'GIF87a', b'GIF89a'):
+        # Check to see if content_type is correct
+        content_type = 'gif'
+        w, h = struct.unpack(b"<HH", data[6:10])
+        width = int(w)
+        height = int(h)
+
+    # See PNG 2. Edition spec (http://www.w3.org/TR/PNG/)
+    # Bytes 0-7 are below, 4-byte chunk length, then 'IHDR'
+    # and finally the 4-byte width, height
+    elif ((size >= 24) and data.startswith(b'\211PNG\r\n\032\n') and (data[12:16] == b'IHDR')):
+        content_type = 'png'
+        w, h = struct.unpack(b">LL", data[16:24])
+        width = int(w)
+        height = int(h)
+
+    # Maybe this is for an older PNG version.
+    elif (size >= 16) and data.startswith(b'\211PNG\r\n\032\n'):
+        # Check to see if we have the right content type
+        content_type = 'png'
+        w, h = struct.unpack(b">LL", data[8:16])
+        width = int(w)
+        height = int(h)
+
+    # handle JPEGs
+    elif (size >= 2) and data.startswith(b'\377\330'):
+        content_type = 'jpg'
+        jpeg = io.BytesIO(data)
+        jpeg.read(2)
+        b = jpeg.read(1)
+        try:
+            while (b and ord(b) != 0xDA):
+                while (ord(b) != 0xFF):
+                    b = jpeg.read(1)
+                while (ord(b) == 0xFF):
+                    b = jpeg.read(1)
+                if (ord(b) >= 0xC0 and ord(b) <= 0xC3):
+                    jpeg.read(3)
+                    h, w = struct.unpack(b">HH", jpeg.read(4))
+                    break
+                else:
+                    jpeg.read(int(struct.unpack(b">H", jpeg.read(2))[0]) - 2)
+                b = jpeg.read(1)
+            width = int(w)
+            height = int(h)
+        except struct.error:
+            pass
+        except ValueError:
+            pass
+
+    return content_type, width, height
 
 
 def query_yes_no(question, default="yes"):
